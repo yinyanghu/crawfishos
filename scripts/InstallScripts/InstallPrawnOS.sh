@@ -152,7 +152,7 @@ install() {
     fi
 
     #only use the emmc_partition function for "special cases", aka veyron devices
-    if [[ $TARGET == "/dev/mmcblk2p" ]] && $TARGET_EMMC
+    if [[ $TARGET == "/dev/mmcblk1p" ]] && $TARGET_EMMC
     then
         emmc_partition
     else
@@ -249,17 +249,17 @@ emmc_partition() {
     #disable dmesg, writing the partition map tries to write the the first gpt table, which is unmodifiable
     dmesg -D
     echo Writing partition map to internal emmc
-    DISK_SZ="$(blockdev --getsz /dev/mmcblk2)"
+    DISK_SZ="$(blockdev --getsz /dev/mmcblk1)"
     echo Total disk size is: $DISK_SZ
     if [ $DISK_SZ = 30785536 ]
     then
         echo Detected Emmc Type 1
-        sfdisk /dev/mmcblk2 < $RESOURCES/mmc.partmap || true
+        sfdisk /dev/mmcblk1 < $RESOURCES/mmc.partmap || true
 
     elif [ $DISK_SZ = 30777344 ]
     then
         echo Detected Emmc Type 2
-        sfdisk /dev/mmcblk2 < $RESOURCES/mmc_type2.partmap || true
+        sfdisk /dev/mmcblk1 < $RESOURCES/mmc_type2.partmap || true
     else
         echo ERROR! Not a known EMMC type, please open an issue on github or send SolidHal an email with the Total disk size reported above
         echo Try a fallback value? This will allow installation to continue, at the cost of a very small amount of disk space. This may not work.
@@ -268,7 +268,7 @@ emmc_partition() {
             case $yn,$REPLY in
                 Yes,*|*,Yes )
                     echo Trying Emmc Type 2
-                    sfdisk /dev/mmcblk2 < $RESOURCES/mmc_type2.partmap || true
+                    sfdisk /dev/mmcblk1 < $RESOURCES/mmc_type2.partmap || true
                     break
                     ;;
                 * )
